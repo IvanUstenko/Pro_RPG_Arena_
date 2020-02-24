@@ -9,7 +9,7 @@ pygame.init()
 pygame.mixer.music.load('data/c245b81d72ab0bb.wav')
 pygame.mixer.music.play(-1)
 
-def load_image(name):
+def load_image(name):#Функция, которая загружает в игру изображение
     fullname = os.path.join('data', name)
     image = pygame.image.load(fullname).convert()
     image.set_colorkey((0, 255, 0))
@@ -40,7 +40,8 @@ transportC = None
 screen = pygame.display.set_mode(size)
 all_sprites = pygame.sprite.Group()
 
-class Player(pygame.sprite.Sprite):
+class Player(pygame.sprite.Sprite):#класс персонажа игрока
+    #загрузка картинок персонажа игрока
     image1_down = load_image('war1_down.png')
     image2_down = load_image('war2_down.png')
     image3_down = load_image('war3_down.png')
@@ -66,7 +67,7 @@ class Player(pygame.sprite.Sprite):
         self.armor = armor
         self.life = life
 
-    def update(self, args):
+    def update(self, args): #обновление состояния персонажа
         global lvl
         global damage
         global armor
@@ -74,7 +75,7 @@ class Player(pygame.sprite.Sprite):
         global transportC
         global fGreen
         global next_l
-        global hpx, hpy
+        global hpx, hpy #координаты положения персонажа
         global running_sprite
         global attack
         self.lvl = lvl
@@ -87,7 +88,7 @@ class Player(pygame.sprite.Sprite):
             self.tik += 1
             if self.tik == 41:
                 self.tik = 0
-            if go_up == 1:
+            if go_up == 1: #смена картинки персонажа, если он идёт вверх
                 if self.tik == 10:
                     self.image = Player.image2_up
                 if self.tik == 20:
@@ -100,7 +101,7 @@ class Player(pygame.sprite.Sprite):
                     self.rect.y -= 3
                 elif go_fast == 0:
                     self.rect.y -= 1
-            elif go_down == 1:
+            elif go_down == 1: #смена картинки персонажа, если он идёт вниз
                 if self.tik == 10:
                     self.image = Player.image2_down
                 if self.tik == 20:
@@ -113,7 +114,7 @@ class Player(pygame.sprite.Sprite):
                     self.rect.y += 3
                 elif go_fast == 0:
                     self.rect.y += 1
-            elif go_left == 1:
+            elif go_left == 1: #смена картинки персонажа, если он идёт влево
                 if self.tik == 10:
                     self.image = Player.image2_left
                 if self.tik == 20:
@@ -126,7 +127,7 @@ class Player(pygame.sprite.Sprite):
                     self.rect.x -= 3
                 elif go_fast == 0:
                     self.rect.x -= 1
-            elif go_right == 1:
+            elif go_right == 1: #смена картинки персонажа, если он идёт вправо
                 if self.tik == 10:
                     self.image = Player.image2_right
                 if self.tik == 20:
@@ -140,6 +141,7 @@ class Player(pygame.sprite.Sprite):
                 elif go_fast == 0:
                     self.rect.x += 1
             
+            #изменяет положение персонажа, если он переходит на новый уровень
             if self.rect.x < -32:
                 transportC = 'l'
                 self.rect.x = width - 1
@@ -161,6 +163,7 @@ class Player(pygame.sprite.Sprite):
                 lvl += 1
                 fGreen = (105, random.randrange(150, 255, 15), 105)
             
+            #отрисовка уровня, урона, брони,кол-ва жизней и денег персонажа на экран
             a1 = pygame.font.Font(None, 25)
             b1 = a1.render(f'Level: {self.lvl}', 1, RED)
             xt1 = 700
@@ -195,7 +198,7 @@ class Player(pygame.sprite.Sprite):
                 transportC = None
                 next_l = 0
                 
-        if life <= 0:
+        if life <= 0:#проверка на окончание игры, по смерти персонажа
             attack = None
             running_sprite = False
             a0 = pygame.font.Font(None, 50)
@@ -204,14 +207,14 @@ class Player(pygame.sprite.Sprite):
             yt0 = 510
             screen.blit(b0, (xt0, yt0))
         
-        if lvl == 21 and money >= 40:
+        if lvl == 21 and money >= 40: #проверка на окончание игры, по достижении персонажа 20 уровня
             running_sprite = False
             ag = pygame.font.Font(None, 50)
             bg = ag.render(f'You win', 1, RED)
             xtg = 500
             ytg = 510
             screen.blit(bg, (xtg, ytg))
-        elif lvl == 21 and money < 40:
+        elif lvl == 21 and money < 40:#проверка на окончание игры, по достижении персонажа 20 уровня, но недостаточным кол-вом денег
             running_sprite = False
             aq = pygame.font.Font(None, 50)
             bq = aq.render(f'You lose', 1, RED)
@@ -219,7 +222,7 @@ class Player(pygame.sprite.Sprite):
             ytq = 510
             screen.blit(bq, (xtq, ytq))
 
-class Chest(pygame.sprite.Sprite):
+class Chest(pygame.sprite.Sprite):#класс сундука
     image1 = load_image('chest1.png')
 
     def __init__(self, group):
@@ -238,12 +241,14 @@ class Chest(pygame.sprite.Sprite):
         global money
         global armor
         global x, u
-        if running_sprite == True:
+        #проверка на касание персонажа сундука
+        if running_sprite == True: 
             blocks_hit_list = pygame.sprite.spritecollide(self, all_sprites, False)
             if len(blocks_hit_list) > 1:
                 if '[<Player sprite(in 1 groups)>, <Chest sprite(in 1 groups)>]' == str(blocks_hit_list):
                     self.rect.x = -1000
                     self.rect.y = -1000
+                    #выдача персонажу бонуса
                     if lvl // 10 == 0:
                         j = random.random()
                         if j >= 0.5:
@@ -340,7 +345,8 @@ class Chest(pygame.sprite.Sprite):
                 next_l += 1
             
         
-class Skeletron(pygame.sprite.Sprite):
+class Skeletron(pygame.sprite.Sprite):#класс Скелетрона
+    #загрузка картинок персонажа игрока
     image1_down = load_image('skel1_down.png')
     image2_down = load_image('skel2_down.png')
     image3_down = load_image('skel3_down.png')
@@ -364,10 +370,9 @@ class Skeletron(pygame.sprite.Sprite):
         self.damage = 1
         self.armor = 1
         self.life = 5
-        self.k = 0
-        self.at = 0
-        self.bat = 1
-        self.no = 0
+        self.k = 0 #переменная, показывающая сражается ли скелетрон
+        self.at = 0 #атакует ли скелет
+        self.bat = 1 #атакует ли игрок
 
     def update(self, args):
         global transportC
@@ -376,7 +381,7 @@ class Skeletron(pygame.sprite.Sprite):
         global life
         global money
         
-        if running_sprite == True:
+        if running_sprite == True: #проверка, будет ли сражатся скелетрон
             blocks_hit_list = pygame.sprite.spritecollide(self, all_sprites, False)
             if len(blocks_hit_list) > 1:
                 if '[<Player sprite(in 1 groups)>, <Skeletron sprite(in 1 groups)>]' == str(blocks_hit_list):
@@ -384,7 +389,7 @@ class Skeletron(pygame.sprite.Sprite):
             else:
                 self.k = 0
             
-            if transportC != None:
+            if transportC != None: #появление скелетрона на следующем уровне
                 self.rect.x = random.randrange(40, 710)
                 self.rect.y = random.randrange(40, 710)
                 self.damage = (lvl // 5) + 1
@@ -392,6 +397,7 @@ class Skeletron(pygame.sprite.Sprite):
                 self.life = (lvl // 2) + 5
                 next_l += 1
             
+            #хождение и анимация хождения скелетрона
             self.tik += 1
             if self.tik == 41:
                 self.tik = 0
@@ -420,6 +426,8 @@ class Skeletron(pygame.sprite.Sprite):
                         self.image = Skeletron.image2_up
                     if self.tik == 40:
                         self.image = Skeletron.image3_up
+                        
+            #процесс сражения
             elif self.k == 1:
                 attack = 'skel'
                 if attack == 'skel':
@@ -479,13 +487,14 @@ fps = 120
 running = True
 clock = pygame.time.Clock()
  
-while running:
+while running:#главный игровой цикл
     clock.tick(fps)
     screen.fill(fGreen)
     pygame.draw.polygon(screen, BLACK, [[40, 40], [760, 40], [760, 760], [40, 760]], 3)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+        #проверка на нажатия кнопок
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_w:
                 go_up = 1
